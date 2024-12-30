@@ -1,4 +1,4 @@
-select z2.visit_date, z2.source as utm_source, z2.medium as utm_medium, z2.campaign as utm_campaign, sum(z2.visitors_count) as visitors_count, coalesce(sum(z3.daily_spent), 0) as total_cost, 
+select z2.visit_date, sum(z2.visitors_count) as visitors_count, z2.source as utm_source, z2.medium as utm_medium, z2.campaign as utm_campaign, coalesce(sum(z3.daily_spent), 0) as total_cost, 
        sum(z2.leads_count) as leads_count, sum(z2.purchases_count) as purchases_count, sum(z2.revenue) as revenue
 from
 (select cast(visit_date as date) as visit_date, source, medium, campaign, content, count(*) as visitors_count, sum(lead_cnt) as leads_count, sum(purchase_cnt) as purchases_count, coalesce(sum(amount), 0) as revenue
