@@ -67,10 +67,12 @@ from
                     when x2.amount is null
                         then 0
                     else 1
-                end as lead_cnt, 
+                end as lead_cnt,
                 case
-                    when x2.closing_reason = 'Успешно реализовано' or
-                         x2.status_id = 142 
+                    when
+                        x2.closing_reason = 'Успешно реализовано'
+                        or
+                        x2.status_id = 142
                         then 1
                     else 0
                 end as purchase_cnt
