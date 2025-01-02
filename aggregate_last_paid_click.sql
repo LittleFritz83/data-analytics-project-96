@@ -188,9 +188,9 @@ visitors_tab3 as (
     from sessions
     where
         not exists (
-            select *
+            select leads.lead_id
             from leads
-            where visitor_id = sessions.visitor_id
+            where leads.visitor_id = sessions.visitor_id
         )
 ),
 

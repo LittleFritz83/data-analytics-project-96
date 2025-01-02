@@ -1,7 +1,5 @@
 select
     visit_date,
-    extract(week from visit_date) as visit_week,
-    extract(month from visit_date) as visit_month,
     utm_source,
     utm_medium,
     utm_campaign,
@@ -10,25 +8,28 @@ select
     leads_count,
     purchases_count,
     revenue,
+    extract(week from visit_date) as visit_week,
+    extract(month from visit_date) as visit_month,
     case
         when visitors_count = 0
             then 0
         else total_cost / visitors_count
-    end cpu,
+    end as cpu,
     case
         when leads_count = 0
             then 0
         else total_cost / leads_count
-    end cpl,
-    case 
+    end as cpl,
+    case
         when purchases_count = 0
             then 0
         else total_cost / purchases_count
-    end cppu,
-    case when total_cost = 0
-        then 0 
+    end as cppu,
+    case
+        when total_cost = 0
+            then 0
         else (revenue - total_cost) / total_cost * 100
-    end roi  
+    end as roi  
 from
 (select 
    z2.visit_date,
