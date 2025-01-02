@@ -89,7 +89,7 @@ from
                                     campaign,
                                     content
                                 from sessions
-                        ) as x1
+                            ) as x1
                         left join (select
                             visitor_id,
                             visit_date,
@@ -143,10 +143,10 @@ from
                                         from leads
                                         inner join sessions
                                             on
-                                                leads.visitor_id 
+                                                leads.visitor_id
                                                 = sessions.visitor_id
                                                 and
-                                                leads.created_at 
+                                                leads.created_at
                                                 >= sessions.visit_date
                                     ) as y1
                             ) as y2
@@ -177,46 +177,48 @@ from
                 utm_content,
                 sum(daily_spent) as daily_spent
             from
-        (select
-            campaign_date,
-            utm_source,
-            utm_medium,
-            utm_campaign,
-            utm_content,
-            daily_spent
-        from vk_ads
-        union all
-        select
-            campaign_date,
-            utm_source,
-            utm_medium,
-            utm_campaign,
-            utm_content,
-            daily_spent
-        from ya_ads) as x1
-    group by 
-        cast(campaign_date as date),
-        utm_source,
-        utm_medium,
-        utm_campaign,
-        utm_content
-) as z3
-        on
-            z2.visit_date = z3.camp_date
-            and
-            z2.source = z3.utm_source
-            and
-            z2.medium = z3.utm_medium
-            and
-            z2.campaign = z3.utm_campaign
-            and
-            z2.content = z3.utm_content
-    group by z2.visit_date, z2.source, z2.medium, z2.campaign
-    order by 
-        sum(z2.revenue) desc nulls last,
-        z2.visit_date asc,
-        sum(z2.visitors_count) desc,
-        z2.source asc,
-        z2.medium asc,
-        z2.campaign asc
-) as z4;
+                ( 
+                    select
+                        campaign_date,
+                        utm_source,
+                        utm_medium,
+                        utm_campaign,
+                        utm_content,
+                        daily_spent
+                    from vk_ads
+                    union all
+                    select
+                        campaign_date,
+                        utm_source,
+                        utm_medium,
+                        utm_campaign,
+                        utm_content,
+                        daily_spent
+                    from ya_ads
+                ) as x1
+            group by 
+                cast(campaign_date as date),
+                utm_source,
+                utm_medium,
+                utm_campaign,
+                utm_content
+        ) as z3
+            on
+                z2.visit_date = z3.camp_date
+                and
+                z2.source = z3.utm_source
+                and
+                z2.medium = z3.utm_medium
+                and
+                z2.campaign = z3.utm_campaign
+                and
+                z2.content = z3.utm_content
+        group by z2.visit_date, z2.source, z2.medium, z2.campaign
+        order by
+            sum(z2.revenue) desc nulls last,
+            z2.visit_date asc,
+            sum(z2.visitors_count) desc,
+            z2.source asc,
+            z2.medium asc,
+            z2.campaign asc
+    ) as z4;
