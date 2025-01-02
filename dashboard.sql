@@ -124,32 +124,40 @@ from
                         leads.closing_reason,
                         leads.status_id,
                         case
-                            when 
-                                sessions.medium in ('cpc', 'cpm', 'cpa',
-                                'youtube', 'cpp', 'tg', 'social')
-                                 then 0
+                            when
+                                sessions.medium in (
+                                    'cpc', 'cpm', 'cpa',
+                                    'youtube', 'cpp', 'tg', 'social')
+                                then 0
                             else 1
                         end as paid_flag
                     from leads
                     inner join sessions
-                        on leads.visitor_id = sessions.visitor_id and 
-                              leads.created_at >= sessions.visit_date) y1) y2
+                        on 
+                            leads.visitor_id = sessions.visitor_id
+                            and
+                            leads.created_at >= sessions.visit_date) as y1) as y2
             where num = 1) as x2
-                on 
-                    x1.visitor_id = x2.visitor_id and
-                    x1.visit_date = x2.visit_date and
-                    x1.source  = x2.source and
-                    x1.medium = x2.medium and
-                    x1.campaign = x2.campaign and
-                    x1.content = x2.content) z1
-   group by cast(visit_date as date), source, medium, campaign, content) z2
-   left join (select 
-                cast(campaign_date as date) as camp_date,
-                utm_source,
-                utm_medium,
-                utm_campaign,
-                utm_content,
-                sum(daily_spent) as daily_spent
+                on
+                    x1.visitor_id = x2.visitor_id
+                    and
+                    x1.visit_date = x2.visit_date
+                    and
+                    x1.source  = x2.source
+                    and
+                    x1.medium = x2.medium
+                    and
+                    x1.campaign = x2.campaign
+                    and
+                    x1.content = x2.content) as z1
+        group by cast(visit_date as date), source, medium, campaign, content) as z2
+    left join (select 
+                  cast(campaign_date as date) as camp_date,
+                  utm_source,
+                  utm_medium,
+                  utm_campaign,
+                  utm_content,
+                  sum(daily_spent) as daily_spent
               from
                 (select
                    campaign_date,
@@ -172,12 +180,16 @@ from
                        utm_source,
                        utm_medium,
                        utm_campaign,
-                       utm_content) z3
+                       utm_content) as z3
    on 
-      z2.visit_date = z3.camp_date and
-      z2.source = z3.utm_source and
-      z2.medium = z3.utm_medium and
-      z2.campaign = z3.utm_campaign and
+      z2.visit_date = z3.camp_date
+      and
+      z2.source = z3.utm_source
+      and
+      z2.medium = z3.utm_medium
+      and
+      z2.campaign = z3.utm_campaign
+      and
       z2.content = z3.utm_content 
    group by z2.visit_date, z2.source, z2.medium, z2.campaign
   order by sum(z2.revenue) desc nulls last, 
@@ -185,7 +197,7 @@ from
            sum(z2.visitors_count) desc, 
            z2.source, 
            z2.medium, 
-           z2.campaign) z4;
+           z2.campaign) as z4;
 
   
   
