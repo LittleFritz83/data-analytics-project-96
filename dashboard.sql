@@ -177,7 +177,7 @@ from
                 utm_content,
                 sum(daily_spent) as daily_spent
             from
-                ( 
+                (
                     select
                         campaign_date,
                         utm_source,
@@ -196,7 +196,7 @@ from
                         daily_spent
                     from ya_ads
                 ) as x1
-            group by 
+            group by
                 cast(campaign_date as date),
                 utm_source,
                 utm_medium,
