@@ -88,90 +88,95 @@ from
                                     medium,
                                     campaign,
                                     content
-                                from sessions) as x1
-            left join (select
-                visitor_id,
-                visit_date,
-                source,
-                medium,
-                campaign,
-                content,
-                amount,
-                closing_reason,
-                status_id
+                                from sessions
+                        ) as x1
+                        left join (select
+                            visitor_id,
+                            visit_date,
+                            source,
+                            medium,
+                            campaign,
+                            content,
+                            amount,
+                            closing_reason,
+                            status_id
+                        from
+                            (
+                                select
+                                    visitor_id,
+                                    visit_date,
+                                    source,
+                                    medium,
+                                    campaign,
+                                    content,
+                                    amount,
+                                    closing_reason,
+                                    status_id,
+                                    paid_flag,
+                                    row_number()
+                                    over (
+                                        partition by visitor_id
+                                        order by paid_flag asc, visit_date desc
+                                    ) as num
+                                from
+                                    (
+                                        select
+                                            leads.visitor_id,
+                                            sessions.visit_date,
+                                            sessions.source,
+                                            sessions.medium,
+                                            sessions.campaign,
+                                            sessions.content,
+                                            leads.amount,
+                                            leads.closing_reason,
+                                            leads.status_id,
+                                            case
+                                                when
+                                                    sessions.medium in (
+                                                        'cpc', 'cpm', 'cpa',
+                                                        'youtube', 'cpp', 'tg',
+                                                        'social'
+                                                    )
+                                                    then 0
+                                                else 1
+                                            end as paid_flag
+                                        from leads
+                                        inner join sessions
+                                            on
+                                                leads.visitor_id 
+                                                = sessions.visitor_id
+                                                and
+                                                leads.created_at 
+                                                >= sessions.visit_date
+                                    ) as y1
+                            ) as y2
+                        where num = 1) as x2
+                            on
+                                x1.visitor_id = x2.visitor_id
+                                and
+                                x1.visit_date = x2.visit_date
+                                and
+                                x1.source = x2.source
+                                and
+                                x1.medium = x2.medium
+                                and
+                                x1.campaign = x2.campaign
+                                and
+                                x1.content = x2.content
+                    ) as z1
+                group by
+                    cast(visit_date as date), source, medium,
+                    campaign, content
+            ) as z2
+        left join (
+            select
+                cast(campaign_date as date) as camp_date,
+                utm_source,
+                utm_medium,
+                utm_campaign,
+                utm_content,
+                sum(daily_spent) as daily_spent
             from
-                (
-                    select
-                        visitor_id,
-                        visit_date,
-                        source,
-                        medium,
-                        campaign,
-                        content,
-                        amount,
-                        closing_reason,
-                        status_id,
-                        paid_flag,
-                        row_number()
-                        over (
-                            partition by visitor_id
-                            order by paid_flag asc, visit_date desc
-                        ) as num
-                    from
-                        (
-                            select
-                                leads.visitor_id,
-                                sessions.visit_date,
-                                sessions.source,
-                                sessions.medium,
-                                sessions.campaign,
-                                sessions.content,
-                                leads.amount,
-                                leads.closing_reason,
-                                leads.status_id,
-                                case
-                                    when
-                                        sessions.medium in (
-                                            'cpc', 'cpm', 'cpa',
-                                            'youtube', 'cpp', 'tg', 'social'
-                                        )
-                                        then 0
-                                    else 1
-                                end as paid_flag
-                            from leads
-                            inner join sessions
-                                on
-                                    leads.visitor_id = sessions.visitor_id
-                                    and
-                                    leads.created_at >= sessions.visit_date
-                        ) as y1
-                ) as y2
-            where num = 1) as x2
-                on
-                    x1.visitor_id = x2.visitor_id
-                    and
-                    x1.visit_date = x2.visit_date
-                    and
-                    x1.source = x2.source
-                    and
-                    x1.medium = x2.medium
-                    and
-                    x1.campaign = x2.campaign
-                    and
-                    x1.content = x2.content
-        ) as z1
-        group by
-            cast(visit_date as date), source, medium,
-            campaign, content
-    ) as z2
-    left join (select
-        cast(campaign_date as date) as camp_date,
-        utm_source,
-        utm_medium,
-        utm_campaign,
-        utm_content,
-        sum(daily_spent) as daily_spent
-    from
         (select
             campaign_date,
             utm_source,
