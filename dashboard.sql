@@ -29,43 +29,51 @@ select
         when total_cost = 0
             then 0
         else (revenue - total_cost) / total_cost * 100
-    end as roi  
+    end as roi
 from
-(select 
-   z2.visit_date,
-   z2.source as utm_source,
-   z2.medium as utm_medium,
-   z2.campaign as utm_campaign,
-   sum(z2.visitors_count) as visitors_count,
-   coalesce(sum(z3.daily_spent), 0) as total_cost,
-   sum(z2.leads_count) as leads_count,
-   sum(z2.purchases_count) as purchases_count,
-   sum(z2.revenue) as revenue
-from
-(select 
-   cast(visit_date as date) as visit_date,
-   source,
-   medium,
-   campaign,
-   content,
-   count(*) as visitors_count,
-   sum(lead_cnt) as leads_count,
-   sum(purchase_cnt) as purchases_count,
-   coalesce(sum(amount), 0) as revenue
-from
-(select 
-   x1.visitor_id,
-   x1.visit_date,
-   x1.source,
-   x1.medium,
-   x1.campaign,
-   x1.content,
-   x2.amount,
-   x2.closing_reason,
-   x2.status_id,
-   case when x2.amount is null then 0 else 1 end lead_cnt, 
-   case when x2.closing_reason = 'Успешно реализовано' or x2.status_id = 142 
-     then 1 else 0 end purchase_cnt
+    (select
+        z2.visit_date,
+        z2.source as utm_source,
+        z2.medium as utm_medium,
+        z2.campaign as utm_campaign,
+        sum(z2.visitors_count) as visitors_count,
+        coalesce(sum(z3.daily_spent), 0) as total_cost,
+        sum(z2.leads_count) as leads_count,
+        sum(z2.purchases_count) as purchases_count,
+        sum(z2.revenue) as revenue
+    from
+        (select
+            cast(visit_date as date) as visit_date,
+            source,
+            medium,
+            campaign,
+            content,
+            count(*) as visitors_count,
+            sum(lead_cnt) as leads_count,
+            sum(purchase_cnt) as purchases_count,
+            coalesce(sum(amount), 0) as revenue
+        from
+            (select
+                x1.visitor_id,
+                x1.visit_date,
+                x1.source,
+                x1.medium,
+                x1.campaign,
+                x1.content,
+                x2.amount,
+                x2.closing_reason,
+                x2.status_id,
+                case
+                    when x2.amount is null
+                        then 0
+                    else 1
+                end as lead_cnt, 
+                case
+                    when x2.closing_reason = 'Успешно реализовано' or
+                         x2.status_id = 142 
+                        then 1
+                    else 0
+                end as purchase_cnt
 from
 (select distinct 
    visitor_id,
@@ -111,7 +119,13 @@ from
                          leads.amount,
                          leads.closing_reason,
                          leads.status_id, 
-                         case when sessions.medium in ('cpc', 'cpm', 'cpa', 'youtube', 'cpp', 'tg', 'social') then 0 else 1 end paid_flag
+                         case
+                             when sessions.medium in ('cpc', 'cpm', 'cpa', 
+                                                      'youtube', 'cpp', 
+                                                      'tg', 'social')
+                                 then 0
+                             else 1
+                         end as paid_flag
                        from leads 
                          inner join sessions 
                            on leads.visitor_id = sessions.visitor_id and 
