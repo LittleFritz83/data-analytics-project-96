@@ -186,12 +186,12 @@ visitors_tab3 as (
         campaign,
         content
     from sessions
-    where 
+    where
         not exists (
-            select visitor_id
-            from leads l
-            where l.visitor_id = sessions.visitor_id
-    )
+            select *
+            from leads
+            where visitor_id = sessions.visitor_id
+        )
 ),
 
 visitors_tab4 as (
