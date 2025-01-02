@@ -42,7 +42,7 @@ from
                     leads.status_id,
                     coalesce(
                         max(leads.lead_id)
-                            over (partition by sessions.visitor_id),
+                        over (partition by sessions.visitor_id),
                         ''
                     ) as lead_id_max
                 from sessions
