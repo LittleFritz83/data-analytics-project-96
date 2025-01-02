@@ -31,10 +31,10 @@ purchases_tab2 as (
         content,
         amount,
         row_number()
-            over (
-                partition by visitor_id
-                order by visit_date desc
-            )
+        over (
+            partition by visitor_id
+            order by visit_date desc
+        )
         as num
     from purchases_tab1
 ),
@@ -82,10 +82,10 @@ leads_tab2 as (
         campaign,
         content,
         row_number()
-            over (
-                partition by visitor_id
-                order by visit_date desc
-            )
+        over (
+            partition by visitor_id
+            order by visit_date desc
+        )
         as num
     from leads_tab1
 ),
@@ -159,10 +159,10 @@ visitors_tab2 as (
         campaign,
         content,
         row_number()
-            over (
-                partition by visitor_id
-                order by visit_date desc
-            )
+        over (
+            partition by visitor_id
+            order by visit_date desc
+        )
         as num
     from visitors_tab1
 ),
@@ -186,10 +186,11 @@ visitors_tab3 as (
         campaign,
         content
     from sessions
-    where not exists (
-        select visitor_id
-        from leads
-        where leads.visitor_id = sessions.visitor_id
+    where 
+        not exists (
+            select visitor_id
+            from leads l
+            where l.visitor_id = sessions.visitor_id
     )
 ),
 
@@ -256,4 +257,3 @@ from tab2
 order by
     revenue desc, visit_date asc, visitors_count desc,
     utm_source asc, utm_medium asc, utm_campaign asc;
-
