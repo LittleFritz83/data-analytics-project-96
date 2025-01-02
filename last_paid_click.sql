@@ -59,4 +59,5 @@ from
     ) as x2
 where num = 1
 order by
-    amount desc nulls last, visit_date asc, utm_source asc, utm_medium asc, utm_campaign asc;
+    amount desc nulls last, visit_date asc, utm_source asc,
+    utm_medium asc, utm_campaign asc;
