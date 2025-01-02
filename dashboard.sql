@@ -76,16 +76,16 @@ from
                         then 1
                     else 0
                 end as purchase_cnt
-from
-(select distinct 
-   visitor_id,
-   visit_date,
-   source,
-   medium,
-   campaign,
-   content 
- from sessions) as x1
-   left join (select 
+            from
+                (select distinct
+                    visitor_id,
+                    visit_date,
+                    source,
+                    medium,
+                    campaign,
+                    content 
+                from sessions) as x1
+            left join (select
                 visitor_id,
                 visit_date,
                 source,
@@ -94,24 +94,26 @@ from
                 content,
                 amount,
                 closing_reason,
-                status_id 
-              from
-                (select 
-                   visitor_id,
-                   visit_date,
-                   source,
-                   medium,
-                   campaign,
-                   content,
-                   amount,
-                   closing_reason,
-                   status_id,
-                   paid_flag, 
-                   row_number( )
-                   over(partition by visitor_id 
-                        order by paid_flag, visit_date desc) as num 
+                status_id
+            from
+                (select
+                    visitor_id,
+                    visit_date,
+                    source,
+                    medium,
+                    campaign,
+                    content,
+                    amount,
+                    closing_reason,
+                    status_id,
+                    paid_flag,
+                    row_number()
+                    over (
+                        partition by visitor_id
+                        order by paid_flag asc, visit_date desc
+                    ) as num 
                     from
-                      (select 
+                        (select 
                          leads.visitor_id,
                          sessions.visit_date,
                          sessions.source,
